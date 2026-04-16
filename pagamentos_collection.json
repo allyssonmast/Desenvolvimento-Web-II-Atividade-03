@@ -1,0 +1,139 @@
+{
+  "info": {
+    "name": "API Pagamentos",
+    "_postman_id": "12345-abcde-67890-fghij",
+    "description": "Collection para testar API de pagamentos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+
+    {
+      "name": "Criar Pagamento PIX",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"valor\": 100,\n  \"tipo\": \"PIX\",\n  \"descricao\": \"Pagamento via PIX\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/pagamentos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos"]
+        }
+      }
+    },
+
+    {
+      "name": "Criar Pagamento CARTAO",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"valor\": 1500,\n  \"tipo\": \"CARTAO\",\n  \"descricao\": \"Pagamento cartão\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/pagamentos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos"]
+        }
+      }
+    },
+
+    {
+      "name": "Criar Pagamento BOLETO",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"valor\": 300,\n  \"tipo\": \"BOLETO\",\n  \"descricao\": \"Pagamento boleto\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/pagamentos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos"]
+        }
+      }
+    },
+
+    {
+      "name": "Listar Pagamentos",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/pagamentos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos"]
+        }
+      }
+    },
+
+    {
+      "name": "Buscar Pagamento por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/pagamentos/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos", "1"]
+        }
+      }
+    },
+
+    {
+      "name": "Deletar Pagamento",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "http://localhost:8080/pagamentos/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos", "1"]
+        }
+      }
+    },
+
+    {
+      "name": "Buscar por Tipo (PIX)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/pagamentos/tipo/PIX",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["pagamentos", "tipo", "PIX"]
+        }
+      }
+    }
+
+  ]
+}
