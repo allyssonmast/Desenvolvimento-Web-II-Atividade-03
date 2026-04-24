@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// controller.PagamentoController
-
 @RestController
 @RequestMapping("/pagamentos")
 public class PagamentoController {

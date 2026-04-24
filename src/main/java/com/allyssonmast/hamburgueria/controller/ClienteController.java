@@ -14,44 +14,27 @@ public class ClienteController {
     private ClienteService service;
 
     @PostMapping
-    public ResponseEntity<?> criar(
-            @RequestBody Cliente cliente
-    ) {
-        return ResponseEntity.ok(
-                service.criar(cliente)
-        );
+    public ResponseEntity<?> criar(@RequestBody Cliente cliente) {
+        return ResponseEntity.ok(service.criar(cliente));
     }
 
     @GetMapping
     public ResponseEntity<?> listar() {
-        return ResponseEntity.ok(
-                service.listar()
-        );
+        return ResponseEntity.ok(service.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscar(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(
-                service.buscarPorId(id)
-        );
+    public ResponseEntity<?> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(
-            @PathVariable Long id,
-            @RequestBody Cliente cliente
-    ) {
-        return ResponseEntity.ok(
-                service.atualizar(id, cliente)
-        );
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+        return ResponseEntity.ok(service.atualizar(id, cliente));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
 
         service.deletar(id);
 

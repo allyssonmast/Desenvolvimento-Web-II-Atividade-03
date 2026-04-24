@@ -18,12 +18,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// service.impl.PagamentoServiceSimples
-
 @Service
 @Qualifier("simples")
-public class PagamentoServiceSimples
-        implements PagamentoService {
+public class PagamentoServiceSimples implements PagamentoService {
 
     @Autowired
     private PagamentoRepository repository;
@@ -41,23 +38,13 @@ public class PagamentoServiceSimples
     private PagamentoStrategyFactory factory;
 
     @Override
-    public PagamentoResponseDTO processar(
-            PagamentoRequestDTO dto
-    ) {
+    public PagamentoResponseDTO processar(PagamentoRequestDTO dto) {
 
         validarValor(dto.getValor());
 
-        Cliente cliente = clienteRepository
-                .findById(dto.getClienteId())
-                .orElseThrow(() ->
-                        new PaymentException(
-                                "Cliente não encontrado"
-                        ));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new PaymentException("Cliente não encontrado"));
 
-        List<CategoriaPagamento> categorias =
-                categoriaRepository.findAllById(
-                        dto.getCategoriasIds()
-                );
+        List<CategoriaPagamento> categorias = categoriaRepository.findAllById(dto.getCategoriasIds());
 
         Pagamento pagamento = new Pagamento();
 
@@ -69,47 +56,27 @@ public class PagamentoServiceSimples
 
         pagamento.setCategorias(categorias);
 
-        StatusPagamento status = factory
-                .getStrategy(dto.getTipo())
-                .processar(pagamento);
+        StatusPagamento status = factory.getStrategy(dto.getTipo()).processar(pagamento);
 
         pagamento.setStatus(status);
 
         Pagamento salvo = repository.save(pagamento);
 
-        salvarLogAuditoria(
-                "CRIACAO_PAGAMENTO",
-                salvo.getId()
-        );
+        salvarLogAuditoria("CRIACAO_PAGAMENTO", salvo.getId());
 
         return toDTO(salvo);
     }
 
     @Override
-    public PagamentoResponseDTO atualizar(
-            Long id,
-            PagamentoRequestDTO dto
-    ) {
+    public PagamentoResponseDTO atualizar(Long id, PagamentoRequestDTO dto) {
 
         validarValor(dto.getValor());
 
-        Pagamento pagamento = repository.findById(id)
-                .orElseThrow(() ->
-                        new PaymentException(
-                                "Pagamento não encontrado"
-                        ));
+        Pagamento pagamento = repository.findById(id).orElseThrow(() -> new PaymentException("Pagamento não encontrado"));
 
-        Cliente cliente = clienteRepository
-                .findById(dto.getClienteId())
-                .orElseThrow(() ->
-                        new PaymentException(
-                                "Cliente não encontrado"
-                        ));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new PaymentException("Cliente não encontrado"));
 
-        List<CategoriaPagamento> categorias =
-                categoriaRepository.findAllById(
-                        dto.getCategoriasIds()
-                );
+        List<CategoriaPagamento> categorias = categoriaRepository.findAllById(dto.getCategoriasIds());
 
         pagamento.setValor(dto.getValor());
 
@@ -121,19 +88,13 @@ public class PagamentoServiceSimples
 
         pagamento.setCategorias(categorias);
 
-        StatusPagamento status = factory
-                .getStrategy(dto.getTipo())
-                .processar(pagamento);
+        StatusPagamento status = factory.getStrategy(dto.getTipo()).processar(pagamento);
 
         pagamento.setStatus(status);
 
-        Pagamento atualizado =
-                repository.save(pagamento);
+        Pagamento atualizado = repository.save(pagamento);
 
-        salvarLogAuditoria(
-                "ATUALIZACAO_PAGAMENTO",
-                atualizado.getId()
-        );
+        salvarLogAuditoria("ATUALIZACAO_PAGAMENTO", atualizado.getId());
 
         return toDTO(atualizado);
     }
@@ -141,68 +102,43 @@ public class PagamentoServiceSimples
     @Override
     public List<PagamentoResponseDTO> listar() {
 
-        return repository.findAll()
-                .stream()
-                .map(this::toDTO)
-                .toList();
+        return repository.findAll().stream().map(this::toDTO).toList();
     }
 
     @Override
-    public PagamentoResponseDTO buscarPorId(
-            Long id
-    ) {
+    public PagamentoResponseDTO buscarPorId(Long id) {
 
-        Pagamento pagamento = repository
-                .buscarComCliente(id)
-                .orElseThrow(() ->
-                        new PaymentException(
-                                "Pagamento não encontrado"
-                        ));
+        Pagamento pagamento = repository.buscarComCliente(id).orElseThrow(() -> new PaymentException("Pagamento não encontrado"));
 
         return toDTO(pagamento);
     }
 
     @Override
-    public List<PagamentoResponseDTO> buscarPorTipo(
-            TipoPagamento tipo
-    ) {
+    public List<PagamentoResponseDTO> buscarPorTipo(TipoPagamento tipo) {
 
-        return repository.findByTipo(tipo)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+        return repository.findByTipo(tipo).stream().map(this::toDTO).toList();
     }
 
     @Override
     public void deletar(Long id) {
 
         if (!repository.existsById(id)) {
-            throw new PaymentException(
-                    "Pagamento não encontrado"
-            );
+            throw new PaymentException("Pagamento não encontrado");
         }
 
         repository.deleteById(id);
 
-        salvarLogAuditoria(
-                "DELECAO_PAGAMENTO",
-                id
-        );
+        salvarLogAuditoria("DELECAO_PAGAMENTO", id);
     }
 
     private void validarValor(double valor) {
 
         if (valor <= 0) {
-            throw new PaymentException(
-                    "Valor inválido"
-            );
+            throw new PaymentException("Valor inválido");
         }
     }
 
-    private void salvarLogAuditoria(
-            String acao,
-            Long recursoId
-    ) {
+    private void salvarLogAuditoria(String acao, Long recursoId) {
 
         AuditLog log = new AuditLog();
 
@@ -215,12 +151,9 @@ public class PagamentoServiceSimples
         auditRepository.save(log);
     }
 
-    private PagamentoResponseDTO toDTO(
-            Pagamento pagamento
-    ) {
+    private PagamentoResponseDTO toDTO(Pagamento pagamento) {
 
-        PagamentoResponseDTO dto =
-                new PagamentoResponseDTO();
+        PagamentoResponseDTO dto = new PagamentoResponseDTO();
 
         dto.setId(pagamento.getId());
 
