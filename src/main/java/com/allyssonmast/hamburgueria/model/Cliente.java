@@ -1,5 +1,6 @@
 package com.allyssonmast.hamburgueria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +21,6 @@ public class Cliente {
     private String email;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Pagamento> pagamentos;
 }

@@ -1,4 +1,4 @@
-package com.allyssonmast.hamburgueria.repository;
+package com.allyssonmast.hamburgueria.repository.primary;
 
 import com.allyssonmast.hamburgueria.model.Pagamento;
 import com.allyssonmast.hamburgueria.model.TipoPagamento;

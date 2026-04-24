@@ -3,38 +3,71 @@ package com.allyssonmast.hamburgueria.service.impl;
 import com.allyssonmast.hamburgueria.dto.PagamentoRequestDTO;
 import com.allyssonmast.hamburgueria.dto.PagamentoResponseDTO;
 import com.allyssonmast.hamburgueria.exception.PaymentException;
-import com.allyssonmast.hamburgueria.model.Pagamento;
-import com.allyssonmast.hamburgueria.model.StatusPagamento;
-import com.allyssonmast.hamburgueria.model.TipoPagamento;
-import com.allyssonmast.hamburgueria.repository.PagamentoRepository;
+import com.allyssonmast.hamburgueria.model.*;
+import com.allyssonmast.hamburgueria.model.audit.AuditLog;
+import com.allyssonmast.hamburgueria.repository.audit.AuditLogRepository;
+import com.allyssonmast.hamburgueria.repository.primary.CategoriaRepository;
+import com.allyssonmast.hamburgueria.repository.primary.ClienteRepository;
+import com.allyssonmast.hamburgueria.repository.primary.PagamentoRepository;
 import com.allyssonmast.hamburgueria.service.PagamentoService;
 import com.allyssonmast.hamburgueria.strategy.factory.PagamentoStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+// service.impl.PagamentoServiceSimples
 
 @Service
 @Qualifier("simples")
-public class PagamentoServiceSimples implements PagamentoService {
+public class PagamentoServiceSimples
+        implements PagamentoService {
 
     @Autowired
     private PagamentoRepository repository;
 
     @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private AuditLogRepository auditRepository;
+
+    @Autowired
     private PagamentoStrategyFactory factory;
 
-    public PagamentoResponseDTO processar(PagamentoRequestDTO dto) {
+    @Override
+    public PagamentoResponseDTO processar(
+            PagamentoRequestDTO dto
+    ) {
 
-        if (dto.getValor() <= 0) {
-            throw new PaymentException("Valor inválido");
-        }
+        validarValor(dto.getValor());
+
+        Cliente cliente = clienteRepository
+                .findById(dto.getClienteId())
+                .orElseThrow(() ->
+                        new PaymentException(
+                                "Cliente não encontrado"
+                        ));
+
+        List<CategoriaPagamento> categorias =
+                categoriaRepository.findAllById(
+                        dto.getCategoriasIds()
+                );
 
         Pagamento pagamento = new Pagamento();
+
         pagamento.setValor(dto.getValor());
         pagamento.setTipo(dto.getTipo());
         pagamento.setDescricao(dto.getDescricao());
+
+        pagamento.setCliente(cliente);
+
+        pagamento.setCategorias(categorias);
 
         StatusPagamento status = factory
                 .getStrategy(dto.getTipo())
@@ -44,37 +77,96 @@ public class PagamentoServiceSimples implements PagamentoService {
 
         Pagamento salvo = repository.save(pagamento);
 
+        salvarLogAuditoria(
+                "CRIACAO_PAGAMENTO",
+                salvo.getId()
+        );
+
         return toDTO(salvo);
     }
 
-    private PagamentoResponseDTO toDTO(Pagamento p) {
-        PagamentoResponseDTO dto = new PagamentoResponseDTO();
-        dto.setId(p.getId());
-        dto.setValor(p.getValor());
-        dto.setTipo(p.getTipo());
-        dto.setStatus(p.getStatus());
-        return dto;
+    @Override
+    public PagamentoResponseDTO atualizar(
+            Long id,
+            PagamentoRequestDTO dto
+    ) {
+
+        validarValor(dto.getValor());
+
+        Pagamento pagamento = repository.findById(id)
+                .orElseThrow(() ->
+                        new PaymentException(
+                                "Pagamento não encontrado"
+                        ));
+
+        Cliente cliente = clienteRepository
+                .findById(dto.getClienteId())
+                .orElseThrow(() ->
+                        new PaymentException(
+                                "Cliente não encontrado"
+                        ));
+
+        List<CategoriaPagamento> categorias =
+                categoriaRepository.findAllById(
+                        dto.getCategoriasIds()
+                );
+
+        pagamento.setValor(dto.getValor());
+
+        pagamento.setTipo(dto.getTipo());
+
+        pagamento.setDescricao(dto.getDescricao());
+
+        pagamento.setCliente(cliente);
+
+        pagamento.setCategorias(categorias);
+
+        StatusPagamento status = factory
+                .getStrategy(dto.getTipo())
+                .processar(pagamento);
+
+        pagamento.setStatus(status);
+
+        Pagamento atualizado =
+                repository.save(pagamento);
+
+        salvarLogAuditoria(
+                "ATUALIZACAO_PAGAMENTO",
+                atualizado.getId()
+        );
+
+        return toDTO(atualizado);
     }
 
+    @Override
     public List<PagamentoResponseDTO> listar() {
+
         return repository.findAll()
                 .stream()
                 .map(this::toDTO)
                 .toList();
     }
 
-    public PagamentoResponseDTO buscarPorId(Long id) {
-        Pagamento p = repository.findById(id)
-                .orElseThrow(() -> new PaymentException("Não encontrado"));
-        return toDTO(p);
-    }
+    @Override
+    public PagamentoResponseDTO buscarPorId(
+            Long id
+    ) {
 
-    public void deletar(Long id) {
-        repository.deleteById(id);
+        Pagamento pagamento = repository
+                .buscarComCliente(id)
+                .orElseThrow(() ->
+                        new PaymentException(
+                                "Pagamento não encontrado"
+                        ));
+
+        return toDTO(pagamento);
     }
 
     @Override
-    public List<PagamentoResponseDTO> buscarPorTipo(TipoPagamento tipo) {
+    public List<PagamentoResponseDTO> buscarPorTipo(
+            TipoPagamento tipo
+    ) {
+
         return repository.findByTipo(tipo)
                 .stream()
                 .map(this::toDTO)
@@ -82,27 +174,62 @@ public class PagamentoServiceSimples implements PagamentoService {
     }
 
     @Override
-    public PagamentoResponseDTO atualizar(Long id, PagamentoRequestDTO dto) {
-        Pagamento pago = repository.findById(id)
-                .orElseThrow(() -> new PaymentException("Não encontrado"));
+    public void deletar(Long id) {
 
-        if (dto.getValor() <= 0) {
-            throw new PaymentException("Valor inválido");
-        }
-        pago.setValor(dto.getValor());
-
-        if (dto.getTipo() != null) {
-            pago.setTipo(dto.getTipo());
+        if (!repository.existsById(id)) {
+            throw new PaymentException(
+                    "Pagamento não encontrado"
+            );
         }
 
-        pago.setDescricao(dto.getDescricao());
+        repository.deleteById(id);
 
-        StatusPagamento status = factory
-                .getStrategy(pago.getTipo())
-                .processar(pago);
-        pago.setStatus(status);
+        salvarLogAuditoria(
+                "DELECAO_PAGAMENTO",
+                id
+        );
+    }
 
-        Pagamento salvo = repository.save(pago);
-        return toDTO(salvo);
+    private void validarValor(double valor) {
+
+        if (valor <= 0) {
+            throw new PaymentException(
+                    "Valor inválido"
+            );
+        }
+    }
+
+    private void salvarLogAuditoria(
+            String acao,
+            Long recursoId
+    ) {
+
+        AuditLog log = new AuditLog();
+
+        log.setAcao(acao);
+
+        log.setRecursoId(recursoId);
+
+        log.setDataHora(LocalDateTime.now());
+
+        auditRepository.save(log);
+    }
+
+    private PagamentoResponseDTO toDTO(
+            Pagamento pagamento
+    ) {
+
+        PagamentoResponseDTO dto =
+                new PagamentoResponseDTO();
+
+        dto.setId(pagamento.getId());
+
+        dto.setValor(pagamento.getValor());
+
+        dto.setTipo(pagamento.getTipo());
+
+        dto.setStatus(pagamento.getStatus());
+
+        return dto;
     }
 }

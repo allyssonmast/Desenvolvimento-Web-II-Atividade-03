@@ -1,4 +1,4 @@
-package com.allyssonmast.hamburgueria.model;
+package com.allyssonmast.hamburgueria.model.audit;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

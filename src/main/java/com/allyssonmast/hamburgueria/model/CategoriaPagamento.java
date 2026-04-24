@@ -1,5 +1,6 @@
 package com.allyssonmast.hamburgueria.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,5 +19,6 @@ public class CategoriaPagamento {
     private String nome;
 
     @ManyToMany(mappedBy = "categorias")
+    @JsonIgnore
     private List<Pagamento> pagamentos;
 }
