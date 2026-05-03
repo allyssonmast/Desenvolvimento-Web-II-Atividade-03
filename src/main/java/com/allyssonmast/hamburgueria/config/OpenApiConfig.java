@@ -1,5 +1,6 @@
 package com.allyssonmast.hamburgueria.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -14,31 +15,17 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
 
         return new OpenAPI()
-
-                .info(
-                        new Info()
-                                .title("API Hamburgueria")
-                                .version("1.0")
-                                .description("API para gerenciamento da hamburgueria")
-                )
-
-                .addSecurityItem(
-                        new SecurityRequirement()
-                                .addList("bearerAuth")
-                )
-
+                .info(new Info().title("API Hamburgueria").version("1.0").description("API para gerenciamento da hamburgueria"))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(
-                        new io.swagger.v3.oas.models.Components()
-
-                                .addSecuritySchemes(
-                                        "bearerAuth",
-
-                                        new SecurityScheme()
-                                                .name("bearerAuth")
-                                                .type(SecurityScheme.Type.HTTP)
-                                                .scheme("bearer")
-                                                .bearerFormat("JWT")
-                                )
+                        new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .name("bearerAuth")
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        )
                 );
     }
 }
