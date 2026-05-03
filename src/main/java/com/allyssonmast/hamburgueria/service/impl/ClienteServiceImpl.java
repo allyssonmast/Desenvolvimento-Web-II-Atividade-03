@@ -1,11 +1,14 @@
 package com.allyssonmast.hamburgueria.service.impl;
 
 import com.allyssonmast.hamburgueria.dto.ClienteRequestDTO;
+import com.allyssonmast.hamburgueria.dto.ClienteResponseDTO;
 import com.allyssonmast.hamburgueria.model.Cliente;
 import com.allyssonmast.hamburgueria.repository.primary.ClienteRepository;
 import com.allyssonmast.hamburgueria.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,39 +19,78 @@ public class ClienteServiceImpl implements ClienteService {
     private ClienteRepository repository;
 
     @Override
-    public Cliente criar(ClienteRequestDTO clienteRequestDTO) {
+    public ClienteResponseDTO criar(ClienteRequestDTO clienteRequestDTO) {
+
         Cliente cliente = new Cliente();
 
         cliente.setNome(clienteRequestDTO.getNome());
         cliente.setEmail(clienteRequestDTO.getEmail());
-        return repository.save(cliente);
+
+        Cliente salvo = repository.save(cliente);
+
+        return toResponseDTO(salvo);
     }
 
     @Override
-    public List<Cliente> listar() {
-        return repository.findAll();
+    public List<ClienteResponseDTO> listar() {
+
+        return repository.findAll()
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     @Override
-    public Cliente buscarPorId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Cliente não encontrado"));
+    public ClienteResponseDTO buscarPorId(Long id) {
+
+        Cliente cliente = buscarEntidadePorId(id);
+
+        return toResponseDTO(cliente);
     }
 
     @Override
-    public Cliente atualizar(Long id, ClienteRequestDTO dto) {
+    public ClienteResponseDTO atualizar(
+            Long id,
+            ClienteRequestDTO dto
+    ) {
 
-        Cliente existente = buscarPorId(id);
+        Cliente existente = buscarEntidadePorId(id);
 
         existente.setNome(dto.getNome());
         existente.setEmail(dto.getEmail());
 
-        return repository.save(existente);
+        Cliente atualizado = repository.save(existente);
+
+        return toResponseDTO(atualizado);
     }
 
     @Override
     public void deletar(Long id) {
-        repository.deleteById(id);
+
+        Cliente cliente = buscarEntidadePorId(id);
+
+        repository.delete(cliente);
+    }
+
+    private Cliente buscarEntidadePorId(Long id) {
+
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Cliente não encontrado"
+                        )
+                );
+    }
+
+    private ClienteResponseDTO toResponseDTO(Cliente cliente) {
+
+        ClienteResponseDTO dto = new ClienteResponseDTO();
+
+        dto.setId(cliente.getId());
+        dto.setNome(cliente.getNome());
+        dto.setEmail(cliente.getEmail());
+
+        return dto;
     }
 }

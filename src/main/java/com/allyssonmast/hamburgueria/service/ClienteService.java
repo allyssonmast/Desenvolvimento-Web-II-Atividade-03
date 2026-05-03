@@ -1,18 +1,19 @@
 package com.allyssonmast.hamburgueria.service;
 
 import com.allyssonmast.hamburgueria.dto.ClienteRequestDTO;
-import com.allyssonmast.hamburgueria.model.Cliente;
+import com.allyssonmast.hamburgueria.dto.ClienteResponseDTO;
+
 import java.util.List;
 
 public interface ClienteService {
 
-    Cliente criar(ClienteRequestDTO cliente);
+    ClienteResponseDTO criar(ClienteRequestDTO cliente);
 
-    List<Cliente> listar();
+    List<ClienteResponseDTO> listar();
 
-    Cliente buscarPorId(Long id);
+    ClienteResponseDTO buscarPorId(Long id);
 
-    Cliente atualizar(Long id, ClienteRequestDTO cliente);
+    ClienteResponseDTO atualizar(Long id, ClienteRequestDTO cliente);
 
     void deletar(Long id);
 }

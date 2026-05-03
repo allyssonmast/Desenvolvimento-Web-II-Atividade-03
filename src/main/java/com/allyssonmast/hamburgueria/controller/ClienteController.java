@@ -1,10 +1,11 @@
 package com.allyssonmast.hamburgueria.controller;
 
 import com.allyssonmast.hamburgueria.dto.ClienteRequestDTO;
-import com.allyssonmast.hamburgueria.model.Cliente;
+import com.allyssonmast.hamburgueria.dto.ClienteResponseDTO;
 import com.allyssonmast.hamburgueria.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,9 @@ public class ClienteController {
                     description = "Cliente criado com sucesso",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = Cliente.class)
+                            schema = @Schema(
+                                    implementation = ClienteResponseDTO.class
+                            )
                     )
             ),
             @ApiResponse(
@@ -60,7 +63,7 @@ public class ClienteController {
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PostMapping
-    public ResponseEntity<Cliente> criar(
+    public ResponseEntity<ClienteResponseDTO> criar(
 
             @Valid
             @RequestBody
@@ -79,20 +82,20 @@ public class ClienteController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Lista retornada com sucesso"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
+                    description = "Lista retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(
+                                            implementation = ClienteResponseDTO.class
+                                    )
+                            )
+                    )
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping
-    public ResponseEntity<List<Cliente>> listar() {
+    public ResponseEntity<List<ClienteResponseDTO>> listar() {
 
         return ResponseEntity.ok(service.listar());
     }
@@ -109,15 +112,11 @@ public class ClienteController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Cliente não encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscar(
+    public ResponseEntity<ClienteResponseDTO> buscar(
 
             @Parameter(
                     description = "ID do cliente",
@@ -139,21 +138,13 @@ public class ClienteController {
                     description = "Cliente atualizado com sucesso"
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados inválidos"
-            ),
-            @ApiResponse(
                     responseCode = "404",
                     description = "Cliente não encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(
+    public ResponseEntity<ClienteResponseDTO> atualizar(
 
             @Parameter(
                     description = "ID do cliente",
@@ -171,7 +162,7 @@ public class ClienteController {
 
     @Operation(
             summary = "Remover cliente",
-            description = "Remove um cliente pelo ID. Apenas ADMIN pode acessar."
+            description = "Remove um cliente pelo ID."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -181,14 +172,6 @@ public class ClienteController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Cliente não encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
             )
     })
     @PreAuthorize("hasRole('ADMIN')")
