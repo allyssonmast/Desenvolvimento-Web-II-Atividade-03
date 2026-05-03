@@ -2,6 +2,7 @@ package com.allyssonmast.hamburgueria.service.impl;
 
 import com.allyssonmast.hamburgueria.dto.PagamentoRequestDTO;
 import com.allyssonmast.hamburgueria.dto.PagamentoResponseDTO;
+import com.allyssonmast.hamburgueria.exception.NotFoundException;
 import com.allyssonmast.hamburgueria.exception.PaymentException;
 import com.allyssonmast.hamburgueria.model.*;
 import com.allyssonmast.hamburgueria.model.audit.AuditLog;
@@ -42,7 +43,7 @@ public class PagamentoServiceSimples implements PagamentoService {
 
         validarValor(dto.getValor());
 
-        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new PaymentException("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
 
         List<CategoriaPagamento> categorias = categoriaRepository.findAllById(dto.getCategoriasIds());
 
@@ -72,9 +73,9 @@ public class PagamentoServiceSimples implements PagamentoService {
 
         validarValor(dto.getValor());
 
-        Pagamento pagamento = repository.findById(id).orElseThrow(() -> new PaymentException("Pagamento não encontrado"));
+        Pagamento pagamento = repository.findById(id).orElseThrow(() -> new NotFoundException("Pagamento não encontrado"));
 
-        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new PaymentException("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
 
         List<CategoriaPagamento> categorias = categoriaRepository.findAllById(dto.getCategoriasIds());
 
@@ -108,7 +109,7 @@ public class PagamentoServiceSimples implements PagamentoService {
     @Override
     public PagamentoResponseDTO buscarPorId(Long id) {
 
-        Pagamento pagamento = repository.buscarComCliente(id).orElseThrow(() -> new PaymentException("Pagamento não encontrado"));
+        Pagamento pagamento = repository.buscarComCliente(id).orElseThrow(() -> new NotFoundException("Pagamento não encontrado"));
 
         return toDTO(pagamento);
     }
@@ -123,7 +124,7 @@ public class PagamentoServiceSimples implements PagamentoService {
     public void deletar(Long id) {
 
         if (!repository.existsById(id)) {
-            throw new PaymentException("Pagamento não encontrado");
+            throw new NotFoundException("Pagamento não encontrado");
         }
 
         repository.deleteById(id);

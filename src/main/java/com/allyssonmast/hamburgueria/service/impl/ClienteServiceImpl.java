@@ -2,6 +2,7 @@ package com.allyssonmast.hamburgueria.service.impl;
 
 import com.allyssonmast.hamburgueria.dto.ClienteRequestDTO;
 import com.allyssonmast.hamburgueria.dto.ClienteResponseDTO;
+import com.allyssonmast.hamburgueria.exception.NotFoundException;
 import com.allyssonmast.hamburgueria.model.Cliente;
 import com.allyssonmast.hamburgueria.repository.primary.ClienteRepository;
 import com.allyssonmast.hamburgueria.service.ClienteService;
@@ -76,10 +77,7 @@ public class ClienteServiceImpl implements ClienteService {
 
         return repository.findById(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Cliente não encontrado"
-                        )
+                        new NotFoundException("Cliente não encontrado")
                 );
     }
 

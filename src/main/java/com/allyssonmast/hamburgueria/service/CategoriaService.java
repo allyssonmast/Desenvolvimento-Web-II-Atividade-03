@@ -1,18 +1,19 @@
 package com.allyssonmast.hamburgueria.service;
 
 import com.allyssonmast.hamburgueria.dto.CategoriaRequestDTO;
-import com.allyssonmast.hamburgueria.model.CategoriaPagamento;
+import com.allyssonmast.hamburgueria.dto.CategoriaResponseDTO;
+
 import java.util.List;
 
 public interface CategoriaService {
 
-    CategoriaPagamento criar(CategoriaRequestDTO categoria);
+    CategoriaResponseDTO criar(CategoriaRequestDTO categoria);
 
-    List<CategoriaPagamento> listar();
+    List<CategoriaResponseDTO> listar();
 
-    CategoriaPagamento buscarPorId(Long id);
+    CategoriaResponseDTO buscarPorId(Long id);
 
-    CategoriaPagamento atualizar(Long id, CategoriaRequestDTO categoria);
+    CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoria);
 
     void deletar(Long id);
 }

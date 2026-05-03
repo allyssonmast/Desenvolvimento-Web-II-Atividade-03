@@ -1,10 +1,11 @@
 package com.allyssonmast.hamburgueria.controller;
 
 import com.allyssonmast.hamburgueria.dto.CategoriaRequestDTO;
-import com.allyssonmast.hamburgueria.model.CategoriaPagamento;
+import com.allyssonmast.hamburgueria.dto.CategoriaResponseDTO;
 import com.allyssonmast.hamburgueria.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,7 +35,7 @@ public class CategoriaController {
 
     @Operation(
             summary = "Criar categoria",
-            description = "Cria uma nova categoria de pagamento. Apenas usuários ADMIN podem acessar."
+            description = "Cria uma nova categoria de pagamento. Apenas ADMIN pode acessar."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -42,7 +43,9 @@ public class CategoriaController {
                     description = "Categoria criada com sucesso",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = CategoriaPagamento.class)
+                            schema = @Schema(
+                                    implementation = CategoriaResponseDTO.class
+                            )
                     )
             ),
             @ApiResponse(
@@ -60,7 +63,8 @@ public class CategoriaController {
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<CategoriaPagamento> criar(
+    public ResponseEntity<CategoriaResponseDTO> criar(
+
             @Valid
             @RequestBody
             CategoriaRequestDTO categoria
@@ -78,20 +82,21 @@ public class CategoriaController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Lista retornada com sucesso"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
+                    description = "Lista retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(
+                                            implementation =
+                                                    CategoriaResponseDTO.class
+                                    )
+                            )
+                    )
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping
-    public ResponseEntity<List<CategoriaPagamento>> listar() {
+    public ResponseEntity<List<CategoriaResponseDTO>> listar() {
 
         return ResponseEntity.ok(service.listar());
     }
@@ -108,15 +113,11 @@ public class CategoriaController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Categoria não encontrada"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaPagamento> buscar(
+    public ResponseEntity<CategoriaResponseDTO> buscar(
 
             @Parameter(
                     description = "ID da categoria",
@@ -144,15 +145,11 @@ public class CategoriaController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Dados inválidos"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaPagamento> atualizar(
+    public ResponseEntity<CategoriaResponseDTO> atualizar(
 
             @Parameter(
                     description = "ID da categoria",
@@ -180,14 +177,6 @@ public class CategoriaController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Categoria não encontrada"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
             )
     })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")

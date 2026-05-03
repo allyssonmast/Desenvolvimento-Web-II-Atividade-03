@@ -1,24 +1,7 @@
 # Sistema de Pagamentos - Hamburgueria
 
-## Descrição do Projeto
 
-Este projeto consiste em uma API REST desenvolvida com Spring Boot para gerenciamento de pagamentos de uma hamburgueria. O sistema permite o cadastro de clientes, categorias de pagamento e processamento de pagamentos utilizando diferentes estratégias de pagamento.
-
-O projeto foi desenvolvido como atividade prática da disciplina PPGTI 1004 - Desenvolvimento Web II, tendo como foco principal a utilização de persistência híbrida com múltiplas bases de dados e relacionamentos avançados utilizando JPA.
-
----
-
-# Objetivo do Domínio
-
-O domínio escolhido foi um sistema de pagamentos para hamburgueria por permitir a modelagem de relacionamentos complexos entre entidades, além da aplicação de regras de negócio relacionadas ao processamento de pagamentos.
-
-O sistema implementa:
-
-* gerenciamento de clientes
-* gerenciamento de categorias de pagamento
-* processamento de pagamentos
-* auditoria de operações em base separada
-* múltiplos tipos de pagamento utilizando Strategy Pattern
+API REST desenvolvida com Spring Boot para gerenciamento de clientes, categorias e pagamentos de uma hamburgueria, utilizando autenticação JWT, controle de acesso baseado em roles e arquitetura desacoplada com DTOs.
 
 ---
 
@@ -26,328 +9,281 @@ O sistema implementa:
 
 * Java 17
 * Spring Boot
+* Spring Security
+* JWT Authentication
 * Spring Data JPA
-* H2 Database
-* Lombok
-* Maven
-* Swagger/OpenAPI
-* Postman
+* Bean Validation
+* PostgreSQL / H2
+* Swagger OpenAPI
 
 ---
 
-# Arquitetura do Projeto
+# Arquitetura da Aplicação
 
-O projeto foi organizado utilizando arquitetura em camadas:
+A aplicação segue arquitetura REST com separação de responsabilidades:
 
-* Controller
-* Service
-* Repository
-* DTO
-* Model/Entity
-* Config
+* Controllers → exposição dos endpoints REST
+* Services → regras de negócio
+* Repositories → acesso ao banco de dados
+* DTOs → comunicação da API
+* Entities → representação das tabelas do banco
 
----
-
-# Estrutura de Persistência
-
-A aplicação utiliza duas bases de dados distintas.
-
-## Base Principal
-
-Responsável por armazenar os dados principais do domínio:
-
-* clientes
-* pagamentos
-* categorias de pagamento
-
-## Base de Auditoria
-
-Responsável pelo armazenamento dos logs de auditoria das operações realizadas no sistema.
-
-Toda operação de criação, atualização ou remoção de pagamentos gera automaticamente um registro de auditoria.
+A aplicação utiliza DTOs para desacoplar totalmente as entidades do banco da interface da API.
 
 ---
 
-# Configuração de Múltiplas Bases
+# Segurança da Aplicação
 
-O projeto possui duas configurações distintas de datasource:
+A autenticação é realizada utilizando JWT Token.
 
-* `PrimaryDatabaseConfig`
-* `AuditDatabaseConfig`
-
-Cada base possui:
-
-* datasource próprio
-* transaction manager próprio
-* entity manager próprio
-
----
-
-# Modelagem das Entidades
-
-## Cliente
-
-Representa os clientes do sistema.
-
-### Relacionamentos
-
-* Um cliente pode possuir vários pagamentos.
-
-Relacionamento:
-
-* One-to-Many
-
----
-
-## Pagamento
-
-Representa os pagamentos realizados no sistema.
-
-### Relacionamentos
-
-* Muitos pagamentos podem pertencer a um cliente.
-* Um pagamento pode possuir várias categorias.
-
-Relacionamentos:
-
-* Many-to-One
-* Many-to-Many
-
----
-
-## CategoriaPagamento
-
-Representa categorias associadas aos pagamentos.
-
-Exemplos:
-
-* DELIVERY
-* ASSINATURA
-
-Relacionamento:
-
-* Many-to-Many
-
----
-
-# Relacionamentos Implementados
-
-## One-to-Many / Many-to-One
-
-Cliente -> Pagamento
-
-```txt
-Um cliente pode possuir vários pagamentos.
-Um pagamento pertence a apenas um cliente.
-```
-
----
-
-## Many-to-Many
-
-Pagamento -> CategoriaPagamento
-
-```txt
-Um pagamento pode possuir várias categorias.
-Uma categoria pode estar associada a vários pagamentos.
-```
-
----
-
-# Uso de Cascade
-
-Foi utilizada configuração de cascade para garantir integridade nas operações entre entidades relacionadas.
-
-Exemplo:
+O controle de acesso é feito utilizando:
 
 ```java
-@OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+@PreAuthorize(...)
 ```
 
-e
+com regras baseadas em roles.
+
+Roles disponíveis:
+
+* ADMIN
+* MANAGER
+* ATTENDANT
+
+---
+
+# Matriz de Permissões
+
+| Endpoint                | Método | ADMIN | MANAGER | ATTENDANT | Público |
+| ----------------------- | ------ | ----- | ------- | --------- | ------- |
+| /info                   | GET    | ✅     | ✅       | ✅         | ✅       |
+| /auth/login             | POST   | ✅     | ✅       | ✅         | ✅       |
+| /clientes               | GET    | ✅     | ✅       | ✅         | ❌       |
+| /clientes               | POST   | ✅     | ✅       | ❌         | ❌       |
+| /clientes/{id}          | GET    | ✅     | ✅       | ✅         | ❌       |
+| /clientes/{id}          | PUT    | ✅     | ✅       | ❌         | ❌       |
+| /clientes/{id}          | DELETE | ✅     | ❌       | ❌         | ❌       |
+| /categorias             | GET    | ✅     | ✅       | ✅         | ❌       |
+| /categorias             | POST   | ✅     | ❌       | ❌         | ❌       |
+| /categorias/{id}        | GET    | ✅     | ✅       | ✅         | ❌       |
+| /categorias/{id}        | PUT    | ✅     | ✅       | ✅         | ❌       |
+| /categorias/{id}        | DELETE | ✅     | ✅       | ❌         | ❌       |
+| /pagamentos             | GET    | ✅     | ✅       | ✅         | ❌       |
+| /pagamentos             | POST   | ✅     | ❌       | ❌         | ❌       |
+| /pagamentos/{id}        | GET    | ✅     | ✅       | ✅         | ❌       |
+| /pagamentos/{id}        | PUT    | ✅     | ✅       | ❌         | ❌       |
+| /pagamentos/{id}        | DELETE | ✅     | ❌       | ❌         | ❌       |
+| /pagamentos/tipo/{tipo} | GET    | ✅     | ✅       | ✅         | ❌       |
+| /auditoria              | GET    | ✅     | ❌       | ❌         | ❌       |
+
+---
+
+# Autenticação
+
+## Login
+
+Endpoint:
+
+```http
+POST /auth/login
+```
+
+### Request
+
+```json
+{
+  "username": "admin",
+  "password": "123456"
+}
+```
+
+### Response
+
+```json
+{
+  "token": "jwt_token_aqui"
+}
+```
+
+---
+
+# Exemplos de DTOs
+
+## Desacoplamento entre Entidade e API
+
+A aplicação não expõe diretamente as entidades do banco de dados.
+
+As entidades representam a estrutura interna persistida no banco, enquanto os DTOs controlam os dados enviados e recebidos pela API.
+
+---
+
+# Exemplo: Cliente
+
+## Entidade (Banco de Dados)
 
 ```java
-@ManyToMany(cascade = CascadeType.PERSIST)
+public class Cliente {
+
+    private Long id;
+    private String nome;
+    private String email;
+    private String senha;
+}
+```
+
+A entidade possui atributos internos que não devem ser expostos diretamente.
+
+---
+
+## DTO de Entrada (Request)
+
+Utilizado para criação e atualização de clientes.
+
+### Exemplo Request
+
+```json
+{
+  "nome": "Allysson",
+  "email": "allysson@email.com"
+}
 ```
 
 ---
 
-# Validação de Dados
+## DTO de Saída (Response)
 
-A API realiza validação dos dados recebidos utilizando DTOs e validações de negócio.
+Utilizado para retorno da API.
 
-Exemplos:
+### Exemplo Response
 
-* validação de valor positivo para pagamentos
-* validação de cliente existente
-* validação de categorias existentes
-
----
-
-# DTOs
-
-Foram utilizados DTOs para evitar exposição direta das entidades do banco de dados.
-
-DTOs utilizados:
-
-* PagamentoRequestDTO
-* PagamentoResponseDTO
-* AuditLogResponseDTO
-
----
-
-# Processamento de Pagamentos
-
-O sistema utiliza Strategy Pattern para processar diferentes tipos de pagamento.
-
-## Estratégias Implementadas
-
-### PIX
-
-Pagamentos via PIX são automaticamente aprovados.
-
-### CARTAO
-
-Pagamentos acima de 1000 são recusados.
-
----
-
-# Factory Pattern
-
-Foi utilizada uma factory para selecionar dinamicamente a estratégia correta de processamento de pagamento.
-
-Classe:
-
-```txt
-PagamentoStrategyFactory
+```json
+{
+  "id": 1,
+  "nome": "Allysson",
+  "email": "allysson@email.com"
+}
 ```
 
----
-
-# Auditoria
-
-Toda operação relevante de pagamento gera automaticamente um log na base de auditoria.
-
-Exemplos de ações registradas:
-
-* CRIACAO_PAGAMENTO
-* ATUALIZACAO_PAGAMENTO
-* DELECAO_PAGAMENTO
+Observe que informações sensíveis ou internas não são expostas.
 
 ---
 
-# Requisitos de Consultas
+# Validações
 
-O projeto implementa:
+Os DTOs de entrada utilizam Bean Validation.
 
-## Consulta JPQL
+Exemplos utilizados:
 
 ```java
-@Query("SELECT p FROM Pagamento p WHERE p.valor > :valor")
+@NotBlank
+@Email
+@NotNull
+@Size
 ```
+
+Essas validações garantem integridade dos dados recebidos pela API.
 
 ---
 
-## Consulta SQL Nativa
+# Status HTTP Utilizados
 
-```java
-@Query(value = "SELECT * FROM pagamento WHERE tipo = :tipo", nativeQuery = true)
-```
-
----
-
-## JOIN FETCH
-
-```java
-@Query("SELECT p FROM Pagamento p JOIN FETCH p.cliente WHERE p.id = :id")
-```
-
-Utilizado para controle explícito do carregamento de relacionamentos.
+| Status           | Descrição                        |
+| ---------------- | -------------------------------- |
+| 200 OK           | Requisição realizada com sucesso |
+| 201 Created      | Recurso criado com sucesso       |
+| 204 No Content   | Recurso removido com sucesso     |
+| 400 Bad Request  | Dados inválidos                  |
+| 401 Unauthorized | Usuário não autenticado          |
+| 403 Forbidden    | Usuário sem permissão            |
+| 404 Not Found    | Recurso não encontrado           |
 
 ---
 
 # Endpoints Principais
 
+## Público
+
+```http
+GET /info
+```
+
+---
+
+## Autenticação
+
+```http
+POST /auth/login
+```
+
+---
+
 ## Clientes
 
-* POST `/clientes`
-* GET `/clientes`
+```http
+GET /clientes
+POST /clientes
+GET /clientes/{id}
+PUT /clientes/{id}
+DELETE /clientes/{id}
+```
 
 ---
 
 ## Categorias
 
-* POST `/categorias`
-* GET `/categorias`
+```http
+GET /categorias
+POST /categorias
+GET /categorias/{id}
+PUT /categorias/{id}
+DELETE /categorias/{id}
+```
 
 ---
 
 ## Pagamentos
 
-* POST `/pagamentos`
-* PUT `/pagamentos/{id}`
-* GET `/pagamentos`
-* GET `/pagamentos/{id}`
-* GET `/pagamentos/tipo/{tipo}`
-* DELETE `/pagamentos/{id}`
+```http
+GET /pagamentos
+POST /pagamentos
+GET /pagamentos/{id}
+PUT /pagamentos/{id}
+DELETE /pagamentos/{id}
+GET /pagamentos/tipo/{tipo}
+```
 
 ---
 
 ## Auditoria
 
-* GET `/auditoria`
-
----
-
-# Swagger
-
-Documentação disponível em:
-
-```txt
-http://localhost:8080/swagger-ui/index.html
+```http
+GET /auditoria
 ```
 
 ---
 
-# Como Executar
+# Collection Postman
 
-## Compilar o projeto
+A aplicação possui collection Postman contendo todos os endpoints da API com autenticação JWT automatizada.
+
+---
+
+# Execução do Projeto
+
+## Clonar repositório
 
 ```bash
-mvn clean install
+git clone <https://github.com/allyssonmast/Desenvolvimento-Web-II-Atividade-03>
 ```
 
----
-
-## Executar a aplicação
+## Executar aplicação
 
 ```bash
-mvn spring-boot:run
-```
-
----
-
-# Testes
-
-Os testes da API podem ser realizados utilizando a collection do Postman incluída no projeto.
-
----
-
-# Estrutura do Projeto
-
-```txt
-src
- ├── controller
- ├── service
- ├── repository
- ├── dto
- ├── model
- ├── strategy
- ├── config
+./mvnw spring-boot:run
 ```
 
 ---
 
 # Autor
 
-Allysson Freitas
+Desenvolvido por Allysson Freitas.

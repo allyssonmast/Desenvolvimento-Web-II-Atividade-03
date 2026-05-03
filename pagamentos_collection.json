@@ -197,6 +197,49 @@
               ]
             }
           }
+        },
+        {
+          "name": "BUSCAR CLIENTE POR ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "1"]
+            }
+          }
+        },
+        {
+          "name": "ATUALIZAR CLIENTE",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Allysson Atualizado\",\n  \"email\": \"allyssonnovo@email.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "1"]
+            }
+          }
+        },
+        {
+          "name": "DELETAR CLIENTE",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "1"]
+            }
+          }
         }
       ]
     },
@@ -242,6 +285,49 @@
               ]
             }
           }
+        },
+        {
+          "name": "BUSCAR CATEGORIA POR ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/categorias/1",
+              "host": ["{{base_url}}"],
+              "path": ["categorias", "1"]
+            }
+          }
+        },
+        {
+          "name": "ATUALIZAR CATEGORIA",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"IFOOD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/categorias/1",
+              "host": ["{{base_url}}"],
+              "path": ["categorias", "1"]
+            }
+          }
+        },
+        {
+          "name": "DELETAR CATEGORIA",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/categorias/1",
+              "host": ["{{base_url}}"],
+              "path": ["categorias", "1"]
+            }
+          }
         }
       ]
     },
@@ -285,6 +371,49 @@
               "path": [
                 "pagamentos"
               ]
+            }
+          }
+        },
+        {
+          "name": "BUSCAR PAGAMENTO POR ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/pagamentos/1",
+              "host": ["{{base_url}}"],
+              "path": ["pagamentos", "1"]
+            }
+          }
+        },
+        {
+          "name": "BUSCAR PAGAMENTOS POR TIPO",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/pagamentos/tipo/PIX",
+              "host": ["{{base_url}}"],
+              "path": ["pagamentos", "tipo", "PIX"]
+            }
+          }
+        },
+        {
+          "name": "ATUALIZAR PAGAMENTO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 250,\n  \"tipo\": \"CARTAO\",\n  \"descricao\": \"Pagamento atualizado\",\n  \"clienteId\": 1,\n  \"categoriasIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pagamentos/1",
+              "host": ["{{base_url}}"],
+              "path": ["pagamentos", "1"]
             }
           }
         },

@@ -25,10 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pagamentos")
-@Tag(
-        name = "Pagamentos",
-        description = "Endpoints para gerenciamento e processamento de pagamentos"
-)
+@Tag(name = "Pagamentos", description = "Endpoints para gerenciamento e processamento de pagamentos")
 @SecurityRequirement(name = "bearerAuth")
 public class PagamentoController {
 
@@ -36,231 +33,68 @@ public class PagamentoController {
     @Qualifier("simples") // ou avancado
     private PagamentoService service;
 
-    @Operation(
-            summary = "Criar pagamento",
-            description = "Cria e processa um novo pagamento. Apenas ADMIN pode acessar."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Pagamento criado com sucesso",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = PagamentoResponseDTO.class
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados inválidos"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
-            )
-    })
+    @Operation(summary = "Criar pagamento", description = "Cria e processa um novo pagamento. Apenas ADMIN pode acessar.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Pagamento criado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagamentoResponseDTO.class))), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "401", description = "Não autenticado"), @ApiResponse(responseCode = "403", description = "Acesso negado")})
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PagamentoResponseDTO> criar(
 
-            @Valid
-            @RequestBody
-            PagamentoRequestDTO dto
-    ) {
+            @Valid @RequestBody PagamentoRequestDTO dto) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(service.processar(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.processar(dto));
     }
 
-    @Operation(
-            summary = "Atualizar pagamento",
-            description = "Atualiza os dados de um pagamento existente."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Pagamento atualizado com sucesso",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = PagamentoResponseDTO.class
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados inválidos"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Pagamento não encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            )
-    })
+    @Operation(summary = "Atualizar pagamento", description = "Atualiza os dados de um pagamento existente.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Pagamento atualizado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagamentoResponseDTO.class))), @ApiResponse(responseCode = "400", description = "Dados inválidos"), @ApiResponse(responseCode = "404", description = "Pagamento não encontrado"), @ApiResponse(responseCode = "401", description = "Não autenticado")})
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<PagamentoResponseDTO> atualizar(
 
-            @Parameter(
-                    description = "ID do pagamento",
-                    example = "1"
-            )
-            @PathVariable Long id,
+            @Parameter(description = "ID do pagamento", example = "1") @PathVariable Long id,
 
-            @Valid
-            @RequestBody
-            PagamentoRequestDTO dto
-    ) {
+            @Valid @RequestBody PagamentoRequestDTO dto) {
 
-        return ResponseEntity.ok(
-                service.atualizar(id, dto)
-        );
+        return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
-    @Operation(
-            summary = "Listar pagamentos",
-            description = "Retorna todos os pagamentos cadastrados."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Lista retornada com sucesso",
-                    content = @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(
-                                    schema = @Schema(
-                                            implementation = PagamentoResponseDTO.class
-                                    )
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
-            )
-    })
+    @Operation(summary = "Listar pagamentos", description = "Retorna todos os pagamentos cadastrados.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lista retornada com sucesso", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PagamentoResponseDTO.class)))), @ApiResponse(responseCode = "401", description = "Não autenticado"), @ApiResponse(responseCode = "403", description = "Acesso negado")})
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping
     public ResponseEntity<List<PagamentoResponseDTO>> listar() {
 
-        return ResponseEntity.ok(
-                service.listar()
-        );
+        return ResponseEntity.ok(service.listar());
     }
 
-    @Operation(
-            summary = "Buscar pagamento por ID",
-            description = "Retorna um pagamento específico pelo ID."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Pagamento encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Pagamento não encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            )
-    })
+    @Operation(summary = "Buscar pagamento por ID", description = "Retorna um pagamento específico pelo ID.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Pagamento encontrado"), @ApiResponse(responseCode = "404", description = "Pagamento não encontrado"), @ApiResponse(responseCode = "401", description = "Não autenticado")})
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping("/{id}")
     public ResponseEntity<PagamentoResponseDTO> buscar(
 
-            @Parameter(
-                    description = "ID do pagamento",
-                    example = "1"
-            )
-            @PathVariable Long id
-    ) {
+            @Parameter(description = "ID do pagamento", example = "1") @PathVariable Long id) {
 
-        return ResponseEntity.ok(
-                service.buscarPorId(id)
-        );
+        return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    @Operation(
-            summary = "Buscar pagamentos por tipo",
-            description = "Retorna pagamentos filtrados pelo tipo."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Pagamentos encontrados"
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Tipo inválido"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            )
-    })
+    @Operation(summary = "Buscar pagamentos por tipo", description = "Retorna pagamentos filtrados pelo tipo.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Pagamentos encontrados"), @ApiResponse(responseCode = "400", description = "Tipo inválido"), @ApiResponse(responseCode = "401", description = "Não autenticado")})
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping("/tipo/{tipo}")
     public ResponseEntity<List<PagamentoResponseDTO>> buscarPorTipo(
 
-            @Parameter(
-                    description = "Tipo do pagamento",
-                    example = "PIX"
-            )
-            @PathVariable TipoPagamento tipo
-    ) {
+            @Parameter(description = "Tipo do pagamento", example = "PIX") @PathVariable TipoPagamento tipo) {
 
-        return ResponseEntity.ok(
-                service.buscarPorTipo(tipo)
-        );
+        return ResponseEntity.ok(service.buscarPorTipo(tipo));
     }
 
-    @Operation(
-            summary = "Remover pagamento",
-            description = "Remove um pagamento pelo ID. Apenas ADMIN pode acessar."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Pagamento removido com sucesso"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Pagamento não encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso negado"
-            )
-    })
+    @Operation(summary = "Remover pagamento", description = "Remove um pagamento pelo ID. Apenas ADMIN pode acessar.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Pagamento removido com sucesso"), @ApiResponse(responseCode = "404", description = "Pagamento não encontrado"), @ApiResponse(responseCode = "401", description = "Não autenticado"), @ApiResponse(responseCode = "403", description = "Acesso negado")})
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(
 
-            @Parameter(
-                    description = "ID do pagamento",
-                    example = "1"
-            )
-            @PathVariable Long id
-    ) {
+            @Parameter(description = "ID do pagamento", example = "1") @PathVariable Long id) {
 
         service.deletar(id);
 
