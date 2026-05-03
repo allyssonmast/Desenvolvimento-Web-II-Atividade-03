@@ -1,7 +1,16 @@
 package com.allyssonmast.hamburgueria.controller;
 
 import com.allyssonmast.hamburgueria.dto.CategoriaRequestDTO;
+import com.allyssonmast.hamburgueria.model.CategoriaPagamento;
 import com.allyssonmast.hamburgueria.service.CategoriaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,45 +18,188 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/categorias")
+@Tag(
+        name = "Categorias",
+        description = "Endpoints para gerenciamento de categorias de pagamento"
+)
+@SecurityRequirement(name = "bearerAuth")
 public class CategoriaController {
 
     @Autowired
     private CategoriaService service;
 
+    @Operation(
+            summary = "Criar categoria",
+            description = "Cria uma nova categoria de pagamento. Apenas usuários ADMIN podem acessar."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Categoria criada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CategoriaPagamento.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Não autenticado"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado"
+            )
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> criar(@Valid @RequestBody CategoriaRequestDTO categoria) {
+    public ResponseEntity<CategoriaPagamento> criar(
+            @Valid
+            @RequestBody
+            CategoriaRequestDTO categoria
+    ) {
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(service.criar(categoria));
     }
 
+    @Operation(
+            summary = "Listar categorias",
+            description = "Retorna todas as categorias cadastradas."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista retornada com sucesso"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Não autenticado"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado"
+            )
+    })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping
-    public ResponseEntity<?> listar() {
+    public ResponseEntity<List<CategoriaPagamento>> listar() {
+
         return ResponseEntity.ok(service.listar());
     }
 
+    @Operation(
+            summary = "Buscar categoria por ID",
+            description = "Retorna uma categoria específica pelo ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Categoria encontrada"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Categoria não encontrada"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Não autenticado"
+            )
+    })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscar(@PathVariable Long id) {
+    public ResponseEntity<CategoriaPagamento> buscar(
+
+            @Parameter(
+                    description = "ID da categoria",
+                    example = "1"
+            )
+            @PathVariable Long id
+    ) {
+
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
+    @Operation(
+            summary = "Atualizar categoria",
+            description = "Atualiza os dados de uma categoria existente."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Categoria atualizada com sucesso"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Categoria não encontrada"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Não autenticado"
+            )
+    })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(
+    public ResponseEntity<CategoriaPagamento> atualizar(
+
+            @Parameter(
+                    description = "ID da categoria",
+                    example = "1"
+            )
             @PathVariable Long id,
-            @Valid @RequestBody CategoriaRequestDTO dto
+
+            @Valid
+            @RequestBody
+            CategoriaRequestDTO dto
     ) {
+
         return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
+    @Operation(
+            summary = "Remover categoria",
+            description = "Remove uma categoria pelo ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Categoria removida com sucesso"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Categoria não encontrada"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Não autenticado"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado"
+            )
+    })
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(
+
+            @Parameter(
+                    description = "ID da categoria",
+                    example = "1"
+            )
+            @PathVariable Long id
+    ) {
 
         service.deletar(id);
 
