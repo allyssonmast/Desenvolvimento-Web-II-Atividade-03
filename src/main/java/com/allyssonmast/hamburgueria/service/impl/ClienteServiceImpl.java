@@ -1,5 +1,6 @@
 package com.allyssonmast.hamburgueria.service.impl;
 
+import com.allyssonmast.hamburgueria.dto.ClienteRequestDTO;
 import com.allyssonmast.hamburgueria.model.Cliente;
 import com.allyssonmast.hamburgueria.repository.primary.ClienteRepository;
 import com.allyssonmast.hamburgueria.service.ClienteService;
@@ -15,7 +16,11 @@ public class ClienteServiceImpl implements ClienteService {
     private ClienteRepository repository;
 
     @Override
-    public Cliente criar(Cliente cliente) {
+    public Cliente criar(ClienteRequestDTO clienteRequestDTO) {
+        Cliente cliente = new Cliente();
+
+        cliente.setNome(clienteRequestDTO.getNome());
+        cliente.setEmail(clienteRequestDTO.getEmail());
         return repository.save(cliente);
     }
 
@@ -32,12 +37,12 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente atualizar(Long id, Cliente cliente) {
+    public Cliente atualizar(Long id, ClienteRequestDTO dto) {
 
         Cliente existente = buscarPorId(id);
 
-        existente.setNome(cliente.getNome());
-        existente.setEmail(cliente.getEmail());
+        existente.setNome(dto.getNome());
+        existente.setEmail(dto.getEmail());
 
         return repository.save(existente);
     }

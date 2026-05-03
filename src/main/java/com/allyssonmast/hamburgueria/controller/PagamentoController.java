@@ -7,6 +7,7 @@ import com.allyssonmast.hamburgueria.service.PagamentoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,9 @@ public class PagamentoController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody PagamentoRequestDTO dto) {
-        return ResponseEntity.ok(service.processar(dto));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.processar(dto));
     }
 
     @PreAuthorize(

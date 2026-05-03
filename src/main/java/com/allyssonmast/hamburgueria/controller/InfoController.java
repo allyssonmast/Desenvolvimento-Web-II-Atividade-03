@@ -13,13 +13,7 @@ public class InfoController {
     public ResponseEntity<?> info() {
 
         return ResponseEntity.ok(
-                Map.of(
-                        "sistema",
-                        "Hamburgueria API",
-
-                        "versao",
-                        "1.0"
-                )
-        );
+                Map.of("sistema", "Hamburgueria API",
+                        "versao", "1.0"));
     }
 }

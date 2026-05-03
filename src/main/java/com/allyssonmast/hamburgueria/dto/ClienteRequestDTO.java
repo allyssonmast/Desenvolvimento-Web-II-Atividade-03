@@ -1,19 +1,18 @@
 package com.allyssonmast.hamburgueria.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AuthRequestDTO {
+public class ClienteRequestDTO {
 
     @NotBlank
-    @NotNull
-    private String username;
+    private String nome;
 
+    @Email
     @NotBlank
-    @NotNull
-    private String password;
+    private String email;
 }

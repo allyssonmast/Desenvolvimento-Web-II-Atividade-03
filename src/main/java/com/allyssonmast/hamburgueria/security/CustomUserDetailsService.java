@@ -10,26 +10,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CustomUserDetailsService
-        implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UsuarioRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(
-            String username
-    ) {
+    public UserDetails loadUserByUsername(String username) {
 
-        Usuario usuario =
-                repository
-                        .findByUsername(username)
+        Usuario usuario = repository.findByUsername(username)
 
-                        .orElseThrow(() ->
-                                new UsernameNotFoundException(
-                                        "Usuário não encontrado"
-                                )
-                        );
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         return new User(
 
@@ -37,11 +28,6 @@ public class CustomUserDetailsService
 
                 usuario.getPassword(),
 
-                List.of(
-                        new SimpleGrantedAuthority(
-                                usuario.getRole().name()
-                        )
-                )
-        );
+                List.of(new SimpleGrantedAuthority(usuario.getRole().name())));
     }
 }

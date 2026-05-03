@@ -11,54 +11,33 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET =
-            "minha-chave-super-secreta-com-mais-de-32-caracteres";
+    private static final String SECRET = "minha-chave-super-secreta-com-mais-de-32-caracteres"; //o Certo é armazenar em aplicaçoes como o Vault
 
     private Key getKey() {
 
-        return Keys.hmacShaKeyFor(
-                SECRET.getBytes()
-        );
+        return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(
-            UserDetails user
-    ) {
+    public String generateToken(UserDetails user) {
 
         return Jwts.builder()
 
-                .setSubject(
-                        user.getUsername()
-                )
+                .setSubject(user.getUsername())
 
-                .setIssuedAt(
-                        new Date()
-                )
+                .setIssuedAt(new Date())
 
-                .setExpiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + 1000 * 60 * 60
-                        )
-                )
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
 
-                .signWith(
-                        getKey(),
-                        SignatureAlgorithm.HS256
-                )
+                .signWith(getKey(), SignatureAlgorithm.HS256)
 
                 .compact();
     }
 
-    public String extractUsername(
-            String token
-    ) {
+    public String extractUsername(String token) {
 
         return Jwts.parserBuilder()
 
-                .setSigningKey(
-                        getKey()
-                )
+                .setSigningKey(getKey())
 
                 .build()
 
@@ -69,16 +48,10 @@ public class JwtService {
                 .getSubject();
     }
 
-    public boolean isValid(
-            String token,
-            UserDetails user
-    ) {
+    public boolean isValid(String token, UserDetails user) {
 
-        String username =
-                extractUsername(token);
+        String username = extractUsername(token);
 
-        return username.equals(
-                user.getUsername()
-        );
+        return username.equals(user.getUsername());
     }
 }

@@ -1,8 +1,10 @@
 package com.allyssonmast.hamburgueria.controller;
 
-import com.allyssonmast.hamburgueria.model.CategoriaPagamento;
+import com.allyssonmast.hamburgueria.dto.CategoriaRequestDTO;
 import com.allyssonmast.hamburgueria.service.CategoriaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +18,10 @@ public class CategoriaController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody CategoriaPagamento categoria) {
-        return ResponseEntity.ok(service.criar(categoria));
+    public ResponseEntity<?> criar(@Valid @RequestBody CategoriaRequestDTO categoria) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.criar(categoria));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
@@ -34,8 +38,11 @@ public class CategoriaController {
 
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','ATTENDANT')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody CategoriaPagamento categoria) {
-        return ResponseEntity.ok(service.atualizar(id, categoria));
+    public ResponseEntity<?> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoriaRequestDTO dto
+    ) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")

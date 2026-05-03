@@ -15,88 +15,51 @@ public class DataInitializer {
 
             UsuarioRepository repository,
 
-            PasswordEncoder encoder
-    ) {
+            PasswordEncoder encoder) {
 
         return args -> {
 
-            if (
-                    repository.findByUsername(
-                            "admin"
-                    ).isEmpty()
-            ) {
+            if (repository.findByUsername("admin").isEmpty()) {
 
-                Usuario admin =
-                        new Usuario();
+                Usuario admin = new Usuario();
 
-                admin.setUsername(
-                        "admin"
-                );
+                admin.setUsername("admin");
 
                 admin.setPassword(
 
-                        encoder.encode(
-                                "123456"
-                        )
-                );
+                        encoder.encode("123456"));
 
-                admin.setRole(
-                        Role.ROLE_ADMIN
-                );
+                admin.setRole(Role.ROLE_ADMIN);
 
                 repository.save(admin);
             }
 
-            if (
-                    repository.findByUsername(
-                            "manager"
-                    ).isEmpty()
-            ) {
+            if (repository.findByUsername("manager").isEmpty()) {
 
-                Usuario manager =
-                        new Usuario();
+                Usuario manager = new Usuario();
 
-                manager.setUsername(
-                        "manager"
-                );
+                manager.setUsername("manager");
 
                 manager.setPassword(
 
-                        encoder.encode(
-                                "123456"
-                        )
-                );
+                        encoder.encode("123456"));
 
-                manager.setRole(
-                        Role.ROLE_MANAGER
-                );
+                manager.setRole(Role.ROLE_MANAGER);
 
                 repository.save(manager);
             }
 
-            if (
-                    repository.findByUsername(
-                            "attendant"
-                    ).isEmpty()
-            ) {
+            if (repository.findByUsername("attendant").isEmpty()) {
 
-                Usuario attendant =
-                        new Usuario();
+                Usuario attendant = new Usuario();
 
-                attendant.setUsername(
-                        "attendant"
-                );
+                attendant.setUsername("attendant");
 
                 attendant.setPassword(
 
-                        encoder.encode(
-                                "123456"
-                        )
-                );
+                        encoder.encode("123456"));
 
-                attendant.setRole(
-                        Role.ROLE_ATTENDANT
-                );
+                attendant.setRole(Role.ROLE_ATTENDANT);
 
                 repository.save(attendant);
             }

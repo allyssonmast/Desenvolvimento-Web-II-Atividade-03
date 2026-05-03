@@ -2,6 +2,7 @@ package com.allyssonmast.hamburgueria.controller;
 
 import com.allyssonmast.hamburgueria.dto.*;
 import com.allyssonmast.hamburgueria.security.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -23,36 +24,19 @@ public class AuthController {
     private JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(
-            @RequestBody AuthRequestDTO dto
-    ) {
+    public ResponseEntity<AuthResponseDTO> login(@Valid  @RequestBody AuthRequestDTO dto) {
 
         authManager.authenticate(
-
                 new UsernamePasswordAuthenticationToken(
-
                         dto.getUsername(),
-
-                        dto.getPassword()
-                )
-        );
+                        dto.getPassword()));
 
         UserDetails user =
+                userService.loadUserByUsername(dto.getUsername());
 
-                userService.loadUserByUsername(
-                        dto.getUsername()
-                );
-
-        String token =
-                jwtService.generateToken(
-                        user
-                );
+        String token = jwtService.generateToken(user);
 
         return ResponseEntity.ok(
-
-                new AuthResponseDTO(
-                        token
-                )
-        );
+                new AuthResponseDTO(token));
     }
 }

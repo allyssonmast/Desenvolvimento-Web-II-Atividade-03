@@ -1,8 +1,10 @@
 package com.allyssonmast.hamburgueria.controller;
 
-import com.allyssonmast.hamburgueria.model.Cliente;
+import com.allyssonmast.hamburgueria.dto.ClienteRequestDTO;
 import com.allyssonmast.hamburgueria.service.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +20,11 @@ public class ClienteController {
             "hasAnyRole('ADMIN','MANAGER')"
     )
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody Cliente cliente) {
-        return ResponseEntity.ok(service.criar(cliente));
+    public ResponseEntity<?> criar(
+            @Valid @RequestBody ClienteRequestDTO dto
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.criar(dto));
     }
 
     @PreAuthorize(
@@ -42,7 +47,7 @@ public class ClienteController {
             "hasAnyRole('ADMIN','MANAGER')"
     )
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequestDTO cliente) {
         return ResponseEntity.ok(service.atualizar(id, cliente));
     }
 
